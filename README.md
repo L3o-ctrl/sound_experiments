@@ -1,6 +1,6 @@
 ## Current projects:
 
-* create 2 sine waves, one of which has an adjustable phase
+* create 2 sine waves, one of which has an adjustable phase both with adjustable frequency
 * create a tuner. Code that tells the dominant frequency
 
 ### single sine wave project
