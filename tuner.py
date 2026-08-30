@@ -11,30 +11,40 @@ from scipy.fft import fft, fftfreq
 
 
 # fft link https://realpython.com/python-scipy-fft/
-fig, ax = plt.subplots()
+
+#fig, ax = plt.subplots()# fig=window gen/ ax=buttons etc.
 fig2, ax2 = plt.subplots()
-ax2.set_xlim(0, 500)
-ax2.set_ylim(0,80)
 f=440
 period=1/f
-ax.set_xlim(0,(period*2))
 phase=0
 samplerate=96000
 duration=0.1
+
+#ax.set_xlim(0,(period*2))#makes sine graph the length of two periods for easier reading
+ax2.set_xlim(0, 500)#fft graph x range
+# ax2.set_ylim(0,8)#fft graph y range
 """goals:
 1.make the fft plot
 2.add code for microphone to record sound
 3.check recorded frequency for tuning
 """
 def graph_update():
-    global data, times, line2, xf, yf, samplerate, phase, f, duration, fft_line
-    data, times = m.make_sine(f, duration, samplerate, phase)
-    n=data.shape[0]
-    yf = fft(data)
-    xf = fftfreq(n, 1 / samplerate)
-    #blue line vvvv(unneeded)
-    #fft_line = ax2.plot(xf, yf)
-    line2.set_ydata(data[:times.shape[0], 1])
+    global data, times, line2, line, xf, yf, samplerate, phase, f, duration, fft_line
+    data, times = m.make_sine(f, duration, samplerate, phase)#sets data+times to the output values of make_sine
+    yf, xf = fft_process(data[:times.shape[0], 1], samplerate)
+    # yf=np.absolute(yf)
+
+    # yf, xf = fft_process(data[:times.shape[0], 1], samplerate)
+    # n=data.shape[0]#Length of data array
+    # yf = fft(data[0])#output of fft on data array
+    # xf = fftfreq(n, 1 / samplerate)#sampletime(time for 1 sample)
+    # fft_line, = ax2.plot(xf, yf, 'c')
+    #line vs line 2
+    #line is channel 0 sine wave line & line2 is channel 1
+    #line.set_ydata(data[:times.shape[0], 0])
+    #line2.set_ydata(data[:times.shape[0], 1])
+    # fft channel vvv
+    fft_line.set_ydata(yf)#value to put for set_ydata?
     plt.draw()
 def phase_up():
     global phase, data, line2
@@ -56,8 +66,8 @@ def fft_process(data,samplerate):
     n=data.shape[0]
     yf = fft(data)
     xf = fftfreq(n, 1 / samplerate)
-    graph_update()
-    return yf, xf
+    # graph_update()
+    return np.absolute(yf), xf
 def freq_up():
     global f
     f = f + 10
@@ -75,15 +85,16 @@ k.add_hotkey('a',phase_up)
 k.add_hotkey('d',phase_down)
 #next 2 lines are sine wave
 data, times = m.make_sine(f, duration, samplerate, phase)
-line,=ax.plot(times, data[:times.shape[0], 0])
-line2,=ax.plot(times, data[:times.shape[0], 1])
+#line,=ax.plot(times, data[:times.shape[0], 0])#line for channel 0
+#line2,=ax.plot(times, data[:times.shape[0], 1],'g')#line for channel 1
 #TODO:Add frequency change(done)
 #TODO:make the fft plot realtime
+# still not updating fft plot
 #TODO:change the fft plot to show only 0-5000(done)
-yf, xf = fft_process(data[:times.shape[0], 0],samplerate)
-fft_line,=ax2.plot(xf,yf,'c')
+yf, xf = fft_process(data[:times.shape[0], 1],samplerate)#
+fft_line,=ax2.plot(xf, yf, 'c')
 plt.ion()
 plt.show()
 while True:
-    plt.draw()
+    # plt.draw()
     plt.pause(0.001)
